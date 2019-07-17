@@ -12,7 +12,7 @@ usage: shotgun-nodejs [command] [params]
 
 Interact with Shotgun API.
 If no command is passed, interactive mode will be active.
-Command expandable data param should be a list of colon:separated key and value pairs.`)
+More information about each command may be retrieved with --help.`)
 		.strict(true)
 		.wrap(128)
 		.help()

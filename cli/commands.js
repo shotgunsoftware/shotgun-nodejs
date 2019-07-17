@@ -8,6 +8,15 @@ export default function defineCommands(yargs) {
 	yargs.command({
 		command: 'entity-read <entity> <entityId>',
 		desc: 'Read entity.',
+		builder: (yargs) => {
+			return yargs.positional('entity', {
+				describe: 'Entity type',
+				type: 'string',
+			}).positional('entityId', {
+				describe: 'Target entity ID',
+				type: 'number',
+			});
+		},
 		handler: async (argv) => {
 			printOutput(await getClient(argv).entityRead(argv));
 		}
@@ -22,6 +31,11 @@ export default function defineCommands(yargs) {
 					description: 'Display output as JSON',
 					boolean: true,
 				},
+			}).positional('entity', {
+				describe: 'Entity type',
+				type: 'string',
+			}).positional('params', {
+				describe: 'The rest of the optional parameters (JSON or colon key-value pairs)'
 			});
 		},
 		handler: async (argv) => {
@@ -40,6 +54,14 @@ export default function defineCommands(yargs) {
 	yargs.command({
 		command: 'entity-create <entity> [data..]',
 		desc: 'Create new entity.',
+		builder: (yargs) => {
+			return yargs.positional('entity', {
+				describe: 'Entity type',
+				type: 'string',
+			}).positional('data', {
+				describe: 'Data to initialize entity with (JSON or colon key-value pairs)'
+			});
+		},
 		handler: async (argv) => {
 
 			let { entity } = argv;
