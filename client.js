@@ -256,12 +256,21 @@ class ShotgunApiClient {
 			uploadFileBlob.size = uploadFileBlob.length;
 		}
 
+		// If upload link is not AWS, then API makes guess on the host.
+		// Wrong in test and private environments. Apply correction if needed.
+		let uploadUrl = new URL(uploadMetadata.links.upload);
+		let siteUrl = new URL(this.siteUrl);
+		if (uploadUrl.hostname === siteUrl.hostname) {
+			uploadUrl.protocol = siteUrl.protocol;
+			uploadUrl.port = siteUrl.port;
+		}
+
 		if (this.debug) {
-			console.log('PUT file', uploadMetadata.links.upload, uploadFileBlob.type, uploadFileBlob.size);
+			console.log('PUT file', uploadUrl.href, uploadFileBlob.type, uploadFileBlob.size);
 		}
 
 		// Upload file
-		let uploadResp = await fetch(uploadMetadata.links.upload, {
+		let uploadResp = await fetch(uploadUrl, {
 			method: 'PUT',
 			headers: {
 				'Content-Type': uploadFileBlob.type,
