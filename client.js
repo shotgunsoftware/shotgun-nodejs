@@ -1,13 +1,13 @@
-import fetch from 'node-fetch';
-import fileType from 'file-type';
-import fs from 'fs';
-import path from 'path';
-import Table from 'cli-table3';
-import util from 'util';
+const fetch = require('node-fetch');
+const fileType = require('file-type');
+const fs = require('fs');
+const path = require('path');
+const Table = require('cli-table3');
+const util = require('util');
 
 const REFRESH_EXPIRATION_WINDOW = 1000 * 60 * 3;
 
-export default class ShotgunApiClient {
+class ShotgunApiClient {
 
 	constructor({ siteUrl, username, password, debug }) {
 
@@ -296,7 +296,7 @@ export default class ShotgunApiClient {
 	}
 }
 
-export class PaginatedRecordResponse {
+class PaginatedRecordResponse {
 
 	constructor({ data, links, _pageSize }) {
 		this.data = data;
@@ -395,7 +395,7 @@ class ErrorObject {
 	}
 }
 
-export class RequestError extends Error {
+class RequestError extends Error {
 
 	constructor({ message, method, path, respBody, resp }) {
 
@@ -410,4 +410,11 @@ export class RequestError extends Error {
 		this.body = respBody;
 		this.resp = resp;
 	}
+}
+
+module.exports = {
+	default: ShotgunApiClient,
+	ShotgunApiClient,
+	PaginatedRecordResponse,
+	RequestError,
 }

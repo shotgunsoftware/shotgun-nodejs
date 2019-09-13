@@ -1,9 +1,9 @@
-import chalk from 'chalk';
-import util from 'util';
-import { default as ShotgunClient, RequestError, PaginatedRecordResponse } from '../client.js';
-import { parseColonKeyValue } from '../helper.js';
+const chalk = require('chalk');
+const util = require('util');
+const { default: ShotgunClient, RequestError, PaginatedRecordResponse } = require('../client.js');
+const { parseColonKeyValue } = require('../helper.js');
 
-export default function defineCommands(yargs) {
+module.exports = function defineCommands(yargs) {
 
 	yargs.command({
 		command: 'entity-read <entity> <entityId>',

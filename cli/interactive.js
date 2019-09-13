@@ -1,13 +1,13 @@
-import chalk from 'chalk';
-import fs from 'fs';
-import fuzzy from 'fuzzy';
-import inquirer from 'inquirer';
-import inquirerCheckboxPlusPrompt from 'inquirer-checkbox-plus-prompt';
-import path from 'path';
-import url from 'url';
-import util from 'util';
-import { default as ShotgunClient, RequestError, PaginatedRecordResponse } from '../client.js';
-import { parseColonKeyValue } from '../helper.js';
+const chalk = require('chalk');
+const fs = require('fs');
+const fuzzy = require('fuzzy');
+const inquirer = require('inquirer');
+const inquirerCheckboxPlusPrompt = require('inquirer-checkbox-plus-prompt');
+const path = require('path');
+const url = require('url');
+const util = require('util');
+const { default: ShotgunClient, RequestError, PaginatedRecordResponse } = require('../client.js');
+const { parseColonKeyValue } = require('../helper.js');
 
 inquirer.registerPrompt('checkbox-plus', inquirerCheckboxPlusPrompt);
 
@@ -25,7 +25,7 @@ const defaults = {
 	entity: 'HumanUser',
 };
 
-export default async function run(argv) {
+async function run(argv) {
 
 	let { siteUrl } = await inquirer.prompt({
 		name: 'siteUrl',
@@ -363,3 +363,8 @@ async function promptDataObject() {
 
 	return out;
 }
+
+module.exports = {
+	default: run,
+	run,
+};

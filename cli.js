@@ -1,14 +1,13 @@
-#!node --experimental-modules
-import chalk from 'chalk';
-import Yargs from 'yargs';
-import defineCommands from './cli/commands.js';
-import { default as runInteractive } from './cli/interactive.js';
+const chalk = require('chalk');
+const Yargs = require('yargs');
+const defineCommands = require('./cli/commands.js');
+const { default: runInteractive } = require('./cli/interactive.js');
 
 async function main() {
 
 	let yargs = Yargs
 		.usage(`
-usage: shotgun-nodejs [command] [params]
+Usage: shotgun-nodejs [command] [params]
 
 Interact with Shotgun API.
 If no command is passed, interactive mode will be active.

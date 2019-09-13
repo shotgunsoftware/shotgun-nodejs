@@ -1,4 +1,4 @@
-export function parseColonKeyValue(input) {
+module.exports = function parseColonKeyValue(input) {
 
 	let [ key, value ] = input.split(':', 2);
 
