@@ -1,11 +1,11 @@
-module.exports = function parseColonKeyValue(input) {
+function parseColonKeyValue(input) {
 
 	let [ key, value ] = input.split(':', 2);
 
 	key = (key) ? key.trim() : '';
 	value = (value) ? value.trim() : null;
 
-	if (typeof value === 'string' && (value.startsWith("'") && value.endsWith("'") || value.startsWith('"') && value.endsWith('"'))) {
+	if (typeof value === 'string' && (value.startsWith('\'') && value.endsWith('\'') || value.startsWith('"') && value.endsWith('"'))) {
 		value = value.slice(1, -1);
 	} else if (value === 'true') {
 		value = true;
@@ -17,3 +17,7 @@ module.exports = function parseColonKeyValue(input) {
 
 	return { key, value };
 }
+
+module.exports = {
+	parseColonKeyValue,
+};

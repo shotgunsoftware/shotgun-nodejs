@@ -8,6 +8,7 @@
     "inquirer": "^6.5.0",
     "inquirer-checkbox-plus-prompt": "^1.0.1",
     "node-fetch": "^2.6.0",
+    "require-all": "^3.0.0",
     "yargs": "^13.3.0"
   },
   "name": "shotgun-nodejs",
@@ -15,9 +16,11 @@
   "description": "Autodesk Shotgun REST API library and CLI",
   "main": "client.js",
   "bin": {
-    "shotgun-nodejs": "./cli.js"
+    "shotgun-nodejs": "./cli/index.js"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "eslint": "^6.6.0"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

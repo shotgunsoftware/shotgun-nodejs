@@ -1,19 +1,19 @@
 const fetch = require('node-fetch');
 const fileType = require('file-type');
-const fs = require('fs');
-const path = require('path');
-const Table = require('cli-table3');
 const util = require('util');
+
+const { ErrorResponse, RequestError } = require('./error');
+const { SchemaFieldDefinition } = require('./schema-field-definition');
+const { PaginatedRecordResponse } = require('./paginated-record-response');
 
 const REFRESH_EXPIRATION_WINDOW = 1000 * 60 * 3;
 
 class ShotgunApiClient {
 
-	constructor({ siteUrl, username, password, debug }) {
+	constructor({ siteUrl, credentials, debug }) {
 
 		this.siteUrl = siteUrl;
-		this.username = username;
-		this.password = password;
+		this.credentials = credentials;
 		this._token = null;
 		this.tokenExpirationTimestamp = null;
 		this.debug = debug;
@@ -28,14 +28,11 @@ class ShotgunApiClient {
 		this.tokenExpirationTimestamp = val.expires_in * 1000 + Date.now();
 	}
 
-	async connect() {
+	async connect(credentials = this.credentials) {
 
 		var url = new URL(`${this.siteUrl}/api/v1/auth/access_token`);
-		url.search = new URLSearchParams({
-			username: this.username,
-			password: this.password,
-			grant_type: 'password',
-		});
+		// @NOTE Should they be cleared from memory at this time?
+		url.search = new URLSearchParams(credentials);
 
 		let resp = await fetch(url, {
 			method: 'POST',
@@ -48,13 +45,13 @@ class ShotgunApiClient {
 		try {
 			body = await resp.json();
 		} catch (err) {
-			throw new Error(`Error parsing connect response: ${err.message}`)
+			throw new Error(`Error parsing connect response: ${err.message}`);
 		}
 
 		if (!resp.ok) {
 
 			let errorResp = new ErrorResponse(body);
-			throw new Error(`Error getting connect response: ${errorResp}`)
+			throw new Error(`Error getting connect response: ${errorResp}`);
 		}
 
 		this.token = body;
@@ -66,9 +63,9 @@ class ShotgunApiClient {
 		let { siteUrl, token } = this;
 
 		if (!token)
-			return await connect();
+			return await this.connect();
 
-		var url = new URL(`${this.siteUrl}/api/v1/auth/access_token`);
+		var url = new URL(`${siteUrl}/api/v1/auth/access_token`);
 		url.search = new URLSearchParams({
 			refresh_token: token.refresh_token,
 			grant_type: 'refresh',
@@ -86,12 +83,12 @@ class ShotgunApiClient {
 		try {
 			body = await resp.json();
 		} catch (err) {
-			throw new Error(`Error parsing refresh token response: ${err.message}`)
+			throw new Error(`Error parsing refresh token response: ${err.message}`);
 		}
 
 		if (!resp.ok) {
 			let errorResp = new ErrorResponse(body);
-			throw new Error(`Error getting refresh token response: ${errorResp}`)
+			throw new Error(`Error getting refresh token response: ${errorResp}`);
 		}
 
 		this.token = body;
@@ -280,8 +277,8 @@ class ShotgunApiClient {
 		});
 
 		if (!uploadResp.ok) {
-			let reason = await resp.text();
-			throw new Error(`Error uploading file: ${reason}`)
+			let reason = await uploadResp.text();
+			throw new Error(`Error uploading file: ${reason}`);
 		}
 
 		// Complete loop by persisting metadata
@@ -296,134 +293,84 @@ class ShotgunApiClient {
 		});
 	}
 
-	async schemaGet({ entity }) {
+	async schemaGet({ entity, fieldName, projectId }) {
+
+		let path = '/schema';
+		if (entity) {
+			path += `/${entity}`;
+			if (fieldName) {
+				path += '/fields';
+				if (typeof fieldName === 'string') {
+					path += `/${fieldName}`;
+				}
+			}
+		}
+
+		let body = {};
+		if (projectId)
+			body.project_id = projectId;
+
 		let respBody = await this.request({
 			method: 'GET',
-			path:  `/schema/${entity}/fields`,
+			path,
+			body,
 		});
 		return respBody.data;
 	}
-}
 
-class PaginatedRecordResponse {
+	async schemaFieldCreate({ entity, schemaFieldDefinition }) {
 
-	constructor({ data, links, _pageSize }) {
-		this.data = data;
-		this.links = links || {};
-		this.pageSize = _pageSize;
+		if (!(schemaFieldDefinition instanceof SchemaFieldDefinition))
+			schemaFieldDefinition = new SchemaFieldDefinition(schemaFieldDefinition);
+
+		let body = schemaFieldDefinition.toBody();
+
+		let respBody = await this.request({
+			method: 'POST',
+			path: `/schema/${entity}/fields`,
+			body,
+		});
+		return respBody.data;
 	}
 
-	reachedEnd() {
-		return this.data.length !== this.pageSize;
+	async schemaFieldUpdate({ entity, fieldName, schemaFieldDefinition, projectId }) {
+
+		if (!(schemaFieldDefinition instanceof SchemaFieldDefinition))
+			schemaFieldDefinition = new SchemaFieldDefinition(schemaFieldDefinition);
+
+		let body = schemaFieldDefinition.toBody();
+
+		if (projectId)
+			body.project_id = projectId;
+
+		let respBody = await this.request({
+			method: 'PUT',
+			path: `/schema/${entity}/fields/${fieldName}`,
+			body,
+		});
+		return respBody.data;
 	}
 
-	async getNext({ client }) {
+	async schemaFieldDelete({ entity, fieldName }) {
 
-		let path = this.links.next;
-		return this._get({ path, client });
+		let respBody = await this.request({
+			method: 'DELETE',
+			path: `/schema/${entity}/fields/${fieldName}`,
+		});
+		return respBody;
 	}
 
-	async getPrev({ client }) {
+	async schemaFieldRevive({ entity, fieldName }) {
 
-		let path = this.links.prev;
-		return this._get({ path, client });
-	}
-
-	async _get({ path, client }) {
-
-		if (!path)
-			return;
-
-		let out = new this.constructor(await client.request({
-			path,
-			skipApiPathPrepend: true
-		}));
-
-		// Inherit page size
-		out.pageSize = this.pageSize;
-
-		if (!out.data.length)
-			return;
-
-		return out;
-	}
-
-	getTable() {
-
-		let { data } = this;
-
-		let head = ['id'];
-		head = head.concat(Object.keys(data[0].attributes) || []);
-		head = head.concat(Object.keys(data[0].relationships) || []);
-
-		let table = new Table({ head });
-		for (let row of data) {
-			let values = [row.id];
-			values = values.concat(Object.values(row.attributes) || []);
-
-			let relationshipValues = Object.values(row.relationships) || [];
-			relationshipValues = relationshipValues.map(v => {
-				let { data } = v
-				if (!data) return;
-				if (!Array.isArray(data)) return data.id;
-				return data.map(data2 => {
-					return (typeof data2 !== 'object' || !data2)
-						? data2
-						: data2.id;
-				}).join(', ');
-			});
-			values = values.concat(relationshipValues);
-
-			table.push(values);
-		}
-
-		return table.toString();
-	}
-}
-
-class ErrorResponse {
-	constructor({ errors } = {}) {
-		if (!errors) errors = [];
-		this.errors = errors.map(err => new ErrorObject(err));
-	}
-
-	toString() {
-		return this.errors.map(err => `${err.title} (Code ${err.code})`).join('; ');
-	}
-}
-
-class ErrorObject {
-	constructor({ id, status, code, title, detail, source, meta } = {}) {
-		this.id = id;
-		this.status = status;
-		this.code = code;
-		this.title = title;
-		this.detail = detail;
-		this.source = source;
-		this.meta = meta;
-	}
-}
-
-class RequestError extends Error {
-
-	constructor({ message, method, path, respBody, resp }) {
-
-		if (!message) {
-			message = 'Error performing request';
-			if (method) message += ' ' + method;
-			if (path) message += ' ' + path;
-			if (respBody) message += ': ' + JSON.stringify(respBody);
-		}
-		super(message);
-
-		this.body = respBody;
-		this.resp = resp;
+		let respBody = await this.request({
+			method: 'POST',
+			path: `/schema/${entity}/fields/${fieldName}?revive=true`,
+		});
+		return respBody;
 	}
 }
 
 module.exports = {
 	default: ShotgunApiClient,
 	ShotgunApiClient,
-	PaginatedRecordResponse,
-	RequestError,
-}
+};

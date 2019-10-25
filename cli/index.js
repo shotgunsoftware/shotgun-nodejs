@@ -1,7 +1,7 @@
 const chalk = require('chalk');
 const Yargs = require('yargs');
-const defineCommands = require('./cli/commands.js');
-const { default: runInteractive } = require('./cli/interactive.js');
+const { defineCommands } = require('./commands');
+const { default: runInteractive } = require('./interactive');
 
 async function main() {
 
