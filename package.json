@@ -16,7 +16,7 @@
   "description": "Autodesk Shotgun REST API library and CLI",
   "main": "client.js",
   "bin": {
-    "shotgun-nodejs": "./cli/index.js"
+    "shotgun-nodejs": "node ./cli/index.js"
   },
   "devDependencies": {
     "eslint": "^6.6.0"
