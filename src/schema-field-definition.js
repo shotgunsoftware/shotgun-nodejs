@@ -54,6 +54,7 @@ class SchemaFieldDefinition {
 }
 
 SchemaFieldDefinition.DATA_TYPES = [
+	'calculated',
 	'checkbox',
 	'currency',
 	'date',
@@ -61,6 +62,7 @@ SchemaFieldDefinition.DATA_TYPES = [
 	'duration',
 	'entity',
 	'float',
+	'footage',
 	'list',
 	'multi_entity',
 	'number',
@@ -68,10 +70,8 @@ SchemaFieldDefinition.DATA_TYPES = [
 	'status_list',
 	'text',
 	'timecode',
-	'footage',
 	'url',
 	'uuid',
-	'calculated',
 ];
 
 module.exports = {

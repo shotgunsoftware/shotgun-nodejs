@@ -34,15 +34,15 @@ shotgun-nodejs entity-read HumanUser 3
 
 ### Using as a library
 ```javascript
-import ShotgunClient from 'shotgun-nodejs';
+const { ShotgunApiClient } = require('shotgun-nodejs');
 
 (async function() {
-	let shotgun = new ShotgunClient({
+	let shotgun = new ShotgunApiClient({
 		siteUrl: 'https://mysite.shotgunstudio.com',
 		credentials: {
 			grant_type: 'password',
 			username: 'username',
-			password: '`1q`1q`1q!',
+			password: 'password',
 		}
 	});
 
@@ -63,8 +63,9 @@ To view available list of commands
 ```
 shotgun-nodejs
 ├── cli
-│    ├── commands           CLI Command definitions
+│    ├── commands           CLI command definitions
 │    └── interactive
-│        └── operations     Interactive choice definitions
-└── client.js               Client module
+│        └── operations     CLI interactive choice definitions
+└── src
+     └── client.js          Main module
 ```

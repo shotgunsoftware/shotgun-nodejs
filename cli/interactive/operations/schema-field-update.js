@@ -1,5 +1,5 @@
 const { promptRequired, promptUndefined, promptEntityName, promptDataObject } = require('../prompts');
-const { SchemaFieldDefinition } = require('../../../schema-field-definition');
+const { SchemaFieldDefinition } = require('../../../src/schema-field-definition');
 
 async function run({ client, defaults }) {
 

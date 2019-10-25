@@ -2,8 +2,8 @@ const chalk = require('chalk');
 const requireAll = require('require-all');
 const util = require('util');
 
-const { default: ShotgunClient } = require('../../client');
-const { default: PaginatedRecordResponse } = require('../../paginated-record-response');
+const { default: ShotgunClient } = require('../../src/client');
+const { default: PaginatedRecordResponse } = require('../../src/paginated-record-response');
 
 function defineCommands(yargs) {
 

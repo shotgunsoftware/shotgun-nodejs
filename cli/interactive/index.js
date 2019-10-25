@@ -5,9 +5,9 @@ const requireAll = require('require-all');
 const url = require('url');
 const util = require('util');
 
-const { default: ShotgunClient } = require('../../client');
-const { RequestError } = require('../../error');
-const { PaginatedRecordResponse } = require('../../paginated-record-response');
+const { default: ShotgunClient } = require('../../src/client');
+const { RequestError } = require('../../src/error');
+const { PaginatedRecordResponse } = require('../../src/paginated-record-response');
 
 inquirer.registerPrompt('checkbox-plus', inquirerCheckboxPlusPrompt);
 
