@@ -7,17 +7,22 @@ const { SchemaFieldDefinition } = require('./schema-field-definition');
 const { PaginatedRecordResponse } = require('./paginated-record-response');
 
 const REFRESH_EXPIRATION_WINDOW = 1000 * 60 * 3;
+const DEFAULT_API_BASE_PATH = '/api/v1';
 
 class ShotgunApiClient {
 
-	constructor({ siteUrl, credentials, debug, skipApiPathPrepend }) {
+	constructor({ siteUrl, credentials, debug, apiBasePath = DEFAULT_API_BASE_PATH }) {
 
 		this.siteUrl = siteUrl;
 		this.credentials = credentials;
 		this._token = null;
 		this.tokenExpirationTimestamp = null;
 		this.debug = debug;
-		this.skipApiPathPrepend = skipApiPathPrepend;
+
+		if (apiBasePath && !apiBasePath.startsWith('/'))
+			apiBasePath = '/' + apiBasePath;
+
+		this.apiBasePath = apiBasePath;
 	}
 
 	get token() {
@@ -31,7 +36,9 @@ class ShotgunApiClient {
 
 	async connect(credentials = this.credentials) {
 
-		let url = new URL(`${this.siteUrl}/api/v1/auth/access_token`);
+		let { siteUrl, apiBasePath } = this;
+
+		let url = new URL(`${siteUrl}${apiBasePath}/auth/access_token`);
 		// @NOTE Should they be cleared from memory at this time?
 		url.search = new URLSearchParams(credentials);
 
@@ -61,12 +68,12 @@ class ShotgunApiClient {
 
 	async refreshToken() {
 
-		let { siteUrl, token } = this;
+		let { siteUrl, apiBasePath, token } = this;
 
 		if (!token)
 			return await this.connect();
 
-		let url = new URL(`${siteUrl}/api/v1/auth/access_token`);
+		let url = new URL(`${siteUrl}${apiBasePath}/auth/access_token`);
 		url.search = new URLSearchParams({
 			refresh_token: token.refresh_token,
 			grant_type: 'refresh',
@@ -108,9 +115,9 @@ class ShotgunApiClient {
 		return `${token.token_type} ${token.access_token}`;
 	}
 
-	async request({ method = 'GET', path, headers, body, skipApiPathPrepend = this.skipApiPathPrepend }) {
+	async request({ method = 'GET', path, headers, body }) {
 
-		let { siteUrl, debug } = this;
+		let { siteUrl, apiBasePath, debug } = this;
 
 		if (!path)
 			path = '/';
@@ -118,8 +125,8 @@ class ShotgunApiClient {
 		if (!path.startsWith('/'))
 			path = '/' + path;
 
-		if (!skipApiPathPrepend)
-			path = `/api/v1${path}`;
+		if (apiBasePath)
+			path = `${apiBasePath}${path}`;
 
 		if (!headers)
 			headers = {};
