@@ -10,13 +10,14 @@ const REFRESH_EXPIRATION_WINDOW = 1000 * 60 * 3;
 
 class ShotgunApiClient {
 
-	constructor({ siteUrl, credentials, debug }) {
+	constructor({ siteUrl, credentials, debug, skipApiPathPrepend }) {
 
 		this.siteUrl = siteUrl;
 		this.credentials = credentials;
 		this._token = null;
 		this.tokenExpirationTimestamp = null;
 		this.debug = debug;
+		this.skipApiPathPrepend = skipApiPathPrepend;
 	}
 
 	get token() {
@@ -30,7 +31,7 @@ class ShotgunApiClient {
 
 	async connect(credentials = this.credentials) {
 
-		var url = new URL(`${this.siteUrl}/api/v1/auth/access_token`);
+		let url = new URL(`${this.siteUrl}/api/v1/auth/access_token`);
 		// @NOTE Should they be cleared from memory at this time?
 		url.search = new URLSearchParams(credentials);
 
@@ -65,7 +66,7 @@ class ShotgunApiClient {
 		if (!token)
 			return await this.connect();
 
-		var url = new URL(`${siteUrl}/api/v1/auth/access_token`);
+		let url = new URL(`${siteUrl}/api/v1/auth/access_token`);
 		url.search = new URLSearchParams({
 			refresh_token: token.refresh_token,
 			grant_type: 'refresh',
@@ -107,7 +108,7 @@ class ShotgunApiClient {
 		return `${token.token_type} ${token.access_token}`;
 	}
 
-	async request({ method = 'GET', path, headers, body, skipApiPathPrepend }) {
+	async request({ method = 'GET', path, headers, body, skipApiPathPrepend = this.skipApiPathPrepend }) {
 
 		let { siteUrl, debug } = this;
 
@@ -367,6 +368,23 @@ class ShotgunApiClient {
 			path: `/schema/${entity}/fields/${fieldName}?revive=true`,
 		});
 		return respBody;
+	}
+
+	async preferencesGet({ names } = {}) {
+
+		if (!Array.isArray(names)) names = [names];
+		names = names.filter(Boolean);
+
+		let path = '/preferences';
+
+		let prefs = names.join(',');
+		if (prefs) path += '?' + (new URLSearchParams({ prefs })).toString();
+
+		let respBody = await this.request({
+			method: 'GET',
+			path
+		});
+		return respBody.data;
 	}
 }
 

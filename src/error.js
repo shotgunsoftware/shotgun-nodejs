@@ -25,14 +25,17 @@ class RequestError extends Error {
 
 	constructor({ message, method, path, respBody, resp }) {
 
+		let simpleMessage = 'Error performing request';
+		if (method) simpleMessage += ' ' + method;
+		if (path) simpleMessage += ' ' + path;
+
 		if (!message) {
-			message = 'Error performing request';
-			if (method) message += ' ' + method;
-			if (path) message += ' ' + path;
+			message = simpleMessage;
 			if (respBody) message += ': ' + JSON.stringify(respBody);
 		}
 		super(message);
 
+		this.simpleMessage = simpleMessage;
 		this.body = respBody;
 		this.resp = resp;
 	}
