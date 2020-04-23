@@ -115,7 +115,7 @@ class ShotgunApiClient {
 		return `${token.token_type} ${token.access_token}`;
 	}
 
-	async request({ method = 'GET', path, headers, body }) {
+	async requestRaw({ method = 'GET', path, headers, body, requestId }) {
 
 		let { siteUrl, apiBasePath, debug } = this;
 
@@ -148,11 +148,20 @@ class ShotgunApiClient {
 			}
 		}
 
-		let requestId = Math.random().toString(36).substr(2);
 		if (debug)
 			console.log('Sending request', requestId, url.href, util.inspect({ method, headers, body }, false, Infinity, true));
 
 		let resp = await fetch(url, { method, headers, body });
+		return resp;
+	}
+
+	async request(params) {
+
+		let { debug } = this;
+		let { method, path } = params;
+
+		let requestId = Math.random().toString(36).substr(2);
+		let resp = this.requestRaw({ ...params, requestId });
 
 		let respBody;
 		try {
