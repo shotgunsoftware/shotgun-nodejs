@@ -161,7 +161,7 @@ class ShotgunApiClient {
 		let { method, path } = params;
 
 		let requestId = Math.random().toString(36).substr(2);
-		let resp = this.requestRaw({ ...params, requestId });
+		let resp = await this.requestRaw({ ...params, requestId });
 
 		let respBody;
 		try {
