@@ -1,5 +1,4 @@
 {
-  "type": "module",
   "dependencies": {
     "chalk": "^2.4.2",
     "cli-table3": "^0.5.1",
