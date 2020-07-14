@@ -115,7 +115,7 @@ class ShotgunApiClient {
 		return `${token.token_type} ${token.access_token}`;
 	}
 
-	async requestRaw({ method = 'GET', path, headers, body, requestId }) {
+	async requestRaw({ method = 'GET', path, headers, body, requestId, skipBasePathPrepend }) {
 
 		let { siteUrl, apiBasePath, debug } = this;
 
@@ -125,7 +125,7 @@ class ShotgunApiClient {
 		if (!path.startsWith('/'))
 			path = '/' + path;
 
-		if (apiBasePath)
+		if (apiBasePath && !skipBasePathPrepend)
 			path = `${apiBasePath}${path}`;
 
 		if (!headers)
@@ -302,6 +302,8 @@ class ShotgunApiClient {
 		await this.request({
 			method: 'POST',
 			path: uploadMetadata.links.complete_upload,
+			// links.complete_upload already includes base path
+			skipBasePathPrepend: true,
 			body: {
 				'upload_info': uploadMetadata.data,
 				'upload_data': additionalUploadData
@@ -310,7 +312,7 @@ class ShotgunApiClient {
 		});
 	}
 
-	async schemaGet({ entity, fieldName, projectId }) {
+	async schemaGet({ entity, fieldName, projectId } = {}) {
 
 		let path = '/schema';
 		if (entity) {
