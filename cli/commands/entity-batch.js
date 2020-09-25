@@ -6,7 +6,7 @@ const { getClient, printOutput } = require('./index');
  * Expected input is an array of requests as documented at
  * https://developer.shotgunsoftware.com/rest-api/#batching
  *
- * cli entity-batch '[{"request_type":"create","entity":"Project","data":{"code":"my_new_project","name":"My New Project"}},{"request_type":"update","entity":"Project","record_id":86,"data":{"name":"Some New Project Name"}},{"request_type":"delete","entity":"Project","record_id":86}]'
+ * shotgun-nodejs entity-batch '[{"request_type":"create","entity":"Project","data":{"code":"my_new_project","name":"My New Project"}},{"request_type":"update","entity":"Project","record_id":86,"data":{"name":"Some New Project Name"}},{"request_type":"delete","entity":"Project","record_id":86}]'
  */
 module.exports = {
 	args: '<requests>',

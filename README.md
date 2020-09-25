@@ -95,7 +95,7 @@ a different type of credentials object to the constructor object as follows:
 }
 ```
 
-Different authentication mode for CLI is not available at the moment.
+Interactive CLI only supports password-based authentication at the moment.
 
 ## Missing Support
 
@@ -105,7 +105,6 @@ Currently not able to perform the following:
 - Entity follow-related
 - Entity relationship-related support
 - Hierarchy data-related access
-- Preferences-related access
 - Webhooks-related access
 - Schedule-related access
 

@@ -14,7 +14,7 @@ async function run({ client, defaults }) {
 
 	let fields = '*';
 	if (!allFieldsWanted) {
-		let fieldsSchema = await client.schemaGet({ entity, fields: true });
+		let fieldsSchema = await client.schemaGet({ entity, isFieldsWanted: true });
 		let choices = Object.keys(fieldsSchema).sort().filter(k => k !== 'id');
 
 		let { selectedFields } = await inquirer.prompt([{

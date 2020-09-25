@@ -7,6 +7,7 @@
     "inquirer": "^7.3.3",
     "inquirer-checkbox-plus-prompt": "^1.0.1",
     "node-fetch": "^2.6.1",
+    "qs": "^6.9.4",
     "require-all": "^3.0.0",
     "yargs": "^16.0.3"
   },
