@@ -408,6 +408,25 @@ class ShotgunApiClient {
 		});
 		return respBody.data;
 	}
+
+	/**
+	 * Batch entity CRUD requests
+	 * @param  {Object} options.requests - List of requests to batch.
+	 * @return {Object[]} Mapped operation results.
+	 */
+	async entityBatch({ requests }) {
+
+		let body = {
+			requests
+		};
+
+		let respBody = await this.request({
+			method: 'POST',
+			path: '/entity/_batch/',
+			body,
+		});
+		return respBody.data;
+	}
 }
 
 module.exports = {
