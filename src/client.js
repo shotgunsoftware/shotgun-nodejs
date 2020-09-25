@@ -312,16 +312,20 @@ class ShotgunApiClient {
 		});
 	}
 
-	async schemaGet({ entity, fieldName, projectId } = {}) {
+	/**
+	 * Get entity schema or entity fields schema.
+	 * @param  {string}  [options.entity]    - Entity wanted. If left blank returns all entity schemas.
+	 * @param  {boolean} [options.fields]    - Flag indicating if fields schema is wanted instead
+	 * @param  {number}  [options.projectId] - Project associated with entity.
+	 * @return {Object}  Schema (fields) definition.
+	 */
+	async schemaGet({ entity, fields, projectId } = {}) {
 
 		let path = '/schema';
 		if (entity) {
 			path += `/${entity}`;
-			if (fieldName) {
+			if (fields) {
 				path += '/fields';
-				if (typeof fieldName === 'string') {
-					path += `/${fieldName}`;
-				}
 			}
 		}
 
