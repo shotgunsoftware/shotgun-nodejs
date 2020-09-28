@@ -9,7 +9,7 @@ async function run({ client, defaults }) {
 		default: defaults.schemaEntity || '*',
 	}]);
 
-	let fieldName;
+	let isFieldsWanted = false;
 	if (!entity || entity === '*') {
 
 		entity = undefined;
@@ -19,18 +19,14 @@ async function run({ client, defaults }) {
 		// eslint-disable-next-line require-atomic-updates
 		defaults.schemaEntity = entity;
 
-		({ fieldName } = await inquirer.prompt([{
-			name: 'fieldName',
-			message: 'Field name (optional):',
-			type: 'string',
-			default: defaults.fieldName || '*',
-		}]));
+		let { answer } = await inquirer.prompt([{
+			name: 'answer',
+			message: 'Field schema wanted?',
+			type: 'confirm',
+			default: defaults.isFieldsWanted,
+		}]);
 
-		// eslint-disable-next-line require-atomic-updates
-		defaults.fieldName = fieldName;
-
-		if (fieldName === '*')
-			fieldName = true;
+		isFieldsWanted = defaults.isFieldsWanted = answer;
 	}
 
 	let { projectId } = await inquirer.prompt([{
@@ -46,7 +42,7 @@ async function run({ client, defaults }) {
 	// eslint-disable-next-line require-atomic-updates
 	defaults.projectId = projectId;
 
-	return await client.schemaGet({ entity, projectId, fieldName });
+	return await client.schemaGet({ entity, isFieldsWanted, projectId });
 }
 
 const title = 'View schema';

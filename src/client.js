@@ -1,10 +1,9 @@
 const fetch = require('node-fetch');
-const fileType = require('file-type');
+const qs = require('qs');
+const requireAll = require('require-all');
 const util = require('util');
 
 const { ErrorResponse, RequestError } = require('./error');
-const { SchemaFieldDefinition } = require('./schema-field-definition');
-const { PaginatedRecordResponse } = require('./paginated-record-response');
 
 const REFRESH_EXPIRATION_WINDOW = 1000 * 60 * 3;
 const DEFAULT_API_BASE_PATH = '/api/v1';
@@ -40,7 +39,7 @@ class ShotgunApiClient {
 
 		let url = new URL(`${siteUrl}${apiBasePath}/auth/access_token`);
 		// @NOTE Should they be cleared from memory at this time?
-		url.search = new URLSearchParams(credentials);
+		url.search = qs.stringify(credentials);
 
 		let resp = await fetch(url, {
 			method: 'POST',
@@ -74,7 +73,7 @@ class ShotgunApiClient {
 			return await this.connect();
 
 		let url = new URL(`${siteUrl}${apiBasePath}/auth/access_token`);
-		url.search = new URLSearchParams({
+		url.search = qs.stringify({
 			refresh_token: token.refresh_token,
 			grant_type: 'refresh',
 		});
@@ -115,7 +114,7 @@ class ShotgunApiClient {
 		return `${token.token_type} ${token.access_token}`;
 	}
 
-	async requestRaw({ method = 'GET', path, headers, body, requestId, skipBasePathPrepend }) {
+	async requestRaw({ method = 'GET', path, headers, query, body, requestId, skipBasePathPrepend }) {
 
 		let { siteUrl, apiBasePath, debug } = this;
 
@@ -139,14 +138,11 @@ class ShotgunApiClient {
 		}, inHeaders);
 
 		let url = new URL(path, siteUrl);
-		if (body) {
-			if (method === 'GET' || method === 'HEAD') {
-				url.search = new URLSearchParams(body);
-				body = undefined;
-			} else {
-				body = JSON.stringify(body);
-			}
-		}
+		if (query)
+			url.search = qs.stringify(query);
+
+		if (body)
+			body = JSON.stringify(body);
 
 		if (debug)
 			console.log('Sending request', requestId, url.href, util.inspect({ method, headers, body }, false, Infinity, true));
@@ -178,235 +174,12 @@ class ShotgunApiClient {
 
 		return respBody;
 	}
-
-	async entityReadAll({ entity, fields, filter, pageSize, pageNumber }) {
-
-		let body = {
-			'page[size]': pageSize || 500,
-			'page[number]': pageNumber || 1,
-		};
-
-		if (fields)
-			body.fields = fields;
-
-		if (filter) {
-			for (let k in filter) {
-				body[`filter[${k}]`] = filter[k];
-			}
-		}
-
-		let respBody = await this.request({
-			method: 'GET',
-			path: `/entity/${entity}`,
-			body,
-		});
-		respBody._pageSize = pageSize;
-		return new PaginatedRecordResponse(respBody);
-	}
-
-	async entityRead({ entity, entityId }) {
-		let respBody = await this.request({
-			method: 'GET',
-			path: `/entity/${entity}/${entityId}`,
-		});
-		return respBody.data;
-	}
-
-	async entityCreate({ entity, data }) {
-		let respBody = await this.request({
-			method: 'POST',
-			path: `/entity/${entity}`,
-			body: data
-		});
-		return respBody.data;
-	}
-
-	async entityUpdate({ entity, entityId, data }) {
-		let respBody = await this.request({
-			method: 'PUT',
-			path: `/entity/${entity}/${entityId}`,
-			body: data
-		});
-		return respBody.data;
-	}
-
-	async entityDelete({ entity, entityId }) {
-		let respBody = await this.request({
-			method: 'DELETE',
-			path: `/entity/${entity}/${entityId}`,
-		});
-		return respBody;
-	}
-
-	async entitySearch({ entity, filters, fields }) {
-		let respBody = await this.request({
-			method: 'POST',
-			path: `/entity/${entity}/_search`,
-			body: { filters, fields },
-			headers: {
-				'Content-Type': 'application/vnd+shotgun.api3_array+json'
-			},
-		});
-		return respBody.data;
-	}
-
-	// @TODO Support stream
-	async entityItemUpload({ entity, entityId, fieldName, targetFileName, uploadFileBlob, additionalUploadData = {} }) {
-
-		let path = `/entity/${entity}/${entityId}`;
-		if (fieldName) path += `/${fieldName}`;
-		path += '/_upload';
-
-		// Get upload link
-		let uploadMetadata = await this.request({
-			method: 'GET',
-			path,
-			body: { filename: targetFileName },
-		});
-
-		// Sanity: NodeJS Buffer to Blob
-		if (uploadFileBlob instanceof Buffer) {
-			uploadFileBlob.type = fileType(uploadFileBlob).mime;
-			uploadFileBlob.size = uploadFileBlob.length;
-		}
-
-		// If upload link is not AWS, then API makes guess on the host.
-		// Wrong in test and private environments. Apply correction if needed.
-		let uploadUrl = new URL(uploadMetadata.links.upload);
-		let siteUrl = new URL(this.siteUrl);
-		if (uploadUrl.hostname === siteUrl.hostname) {
-			uploadUrl.protocol = siteUrl.protocol;
-			uploadUrl.port = siteUrl.port;
-		}
-
-		if (this.debug) {
-			console.log('PUT file', uploadUrl.href, uploadFileBlob.type, uploadFileBlob.size);
-		}
-
-		// Upload file
-		let uploadResp = await fetch(uploadUrl, {
-			method: 'PUT',
-			headers: {
-				'Content-Type': uploadFileBlob.type,
-				'Content-Size': uploadFileBlob.size
-			},
-			body: uploadFileBlob,
-		});
-
-		if (!uploadResp.ok) {
-			let reason = await uploadResp.text();
-			throw new Error(`Error uploading file: ${reason}`);
-		}
-
-		// Complete loop by persisting metadata
-		await this.request({
-			method: 'POST',
-			path: uploadMetadata.links.complete_upload,
-			// links.complete_upload already includes base path
-			skipBasePathPrepend: true,
-			body: {
-				'upload_info': uploadMetadata.data,
-				'upload_data': additionalUploadData
-			},
-			skipApiPathPrepend: true,
-		});
-	}
-
-	async schemaGet({ entity, fieldName, projectId } = {}) {
-
-		let path = '/schema';
-		if (entity) {
-			path += `/${entity}`;
-			if (fieldName) {
-				path += '/fields';
-				if (typeof fieldName === 'string') {
-					path += `/${fieldName}`;
-				}
-			}
-		}
-
-		let body = {};
-		if (projectId)
-			body.project_id = projectId;
-
-		let respBody = await this.request({
-			method: 'GET',
-			path,
-			body,
-		});
-		return respBody.data;
-	}
-
-	async schemaFieldCreate({ entity, schemaFieldDefinition }) {
-
-		if (!(schemaFieldDefinition instanceof SchemaFieldDefinition))
-			schemaFieldDefinition = new SchemaFieldDefinition(schemaFieldDefinition);
-
-		let body = schemaFieldDefinition.toBody();
-
-		let respBody = await this.request({
-			method: 'POST',
-			path: `/schema/${entity}/fields`,
-			body,
-		});
-		return respBody.data;
-	}
-
-	async schemaFieldUpdate({ entity, fieldName, schemaFieldDefinition, projectId }) {
-
-		if (!(schemaFieldDefinition instanceof SchemaFieldDefinition))
-			schemaFieldDefinition = new SchemaFieldDefinition(schemaFieldDefinition);
-
-		let body = schemaFieldDefinition.toBody();
-
-		if (projectId)
-			body.project_id = projectId;
-
-		let respBody = await this.request({
-			method: 'PUT',
-			path: `/schema/${entity}/fields/${fieldName}`,
-			body,
-		});
-		return respBody.data;
-	}
-
-	async schemaFieldDelete({ entity, fieldName }) {
-
-		let respBody = await this.request({
-			method: 'DELETE',
-			path: `/schema/${entity}/fields/${fieldName}`,
-		});
-		return respBody;
-	}
-
-	async schemaFieldRevive({ entity, fieldName }) {
-
-		let respBody = await this.request({
-			method: 'POST',
-			path: `/schema/${entity}/fields/${fieldName}?revive=true`,
-		});
-		return respBody;
-	}
-
-	async preferencesGet({ names } = {}) {
-
-		if (!Array.isArray(names)) names = [names];
-		names = names.filter(Boolean);
-
-		let path = '/preferences';
-
-		let prefs = names.join(',');
-		if (prefs) path += '?' + (new URLSearchParams({ prefs })).toString();
-
-		let respBody = await this.request({
-			method: 'GET',
-			path
-		});
-		return respBody.data;
-	}
 }
 
 module.exports = {
 	default: ShotgunApiClient,
 	ShotgunApiClient,
 };
+
+// Apply mixins
+requireAll({ dirname: `${__dirname}/client` });
