@@ -31,7 +31,7 @@ class PaginatedRecordResponse {
 
 		let out = new this.constructor(await client.request({
 			path,
-			skipApiPathPrepend: true
+			skipBasePathPrepend: true
 		}));
 
 		// Inherit page size
@@ -48,8 +48,8 @@ class PaginatedRecordResponse {
 		let { data } = this;
 
 		let head = ['id'];
-		head = head.concat(Object.keys(data[0].attributes) || []);
-		head = head.concat(Object.keys(data[0].relationships) || []);
+		head = head.concat(data[0] && Object.keys(data[0].attributes) || []);
+		head = head.concat(data[0] && Object.keys(data[0].relationships) || []);
 
 		let table = new Table({ head });
 		for (let row of data) {

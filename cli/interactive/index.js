@@ -69,27 +69,69 @@ async function run(argv) {
 	// eslint-disable-next-line no-constant-condition
 	while (true) {
 
-		let { username, password } = await inquirer.prompt([{
-			name: 'username',
-			message: 'Username:',
-			default: argv.username,
-			type: 'input',
-		}, {
-			name: 'password',
-			message: 'Password:',
-			mask: true,
-			default: argv.password,
-			type: 'password',
+		let { grantType } = await inquirer.prompt([{
+			name: 'grantType',
+			message: 'Grant type:',
+			choices: ['Password', 'Client'],
+			type: 'list',
+			default: argv.grant_type,
 		}]);
+
+		argv.grant_type = grantType;
+
+		let credentials;
+		switch(grantType) {
+		case 'Password': {
+			let { username, password } = await inquirer.prompt([{
+				name: 'username',
+				message: 'Username:',
+				default: argv.username,
+				type: 'input',
+			}, {
+				name: 'password',
+				message: 'Password:',
+				mask: true,
+				default: argv.password,
+				type: 'password',
+			}]);
+
+			credentials = {
+				grant_type: 'password',
+				username,
+				password,
+			};
+			break;
+		}
+		case 'Client': {
+			let { client_id, client_secret } = await inquirer.prompt([{
+				name: 'client_id',
+				message: 'Client ID:',
+				default: argv.client_id,
+				type: 'input',
+			}, {
+				name: 'client_secret',
+				message: 'Client secret:',
+				mask: true,
+				default: argv.client_secret,
+				type: 'input',
+			}]);
+
+			credentials = {
+				grant_type: 'client_credentials',
+				client_id,
+				client_secret,
+			};
+			break;
+		}
+		default:
+			console.log(chalk.red(`Unknown grant type: ${grantType}`));
+			continue;
+		}
 
 		console.log(`Connecting to ${chalk.green(siteUrl)}...`);
 		client = new ShotgunClient({
 			siteUrl,
-			credentials: {
-				username,
-				password,
-				grant_type: 'password',
-			},
+			credentials,
 			debug: argv.debug,
 		});
 

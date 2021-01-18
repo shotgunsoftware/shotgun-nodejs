@@ -6,12 +6,12 @@ const { PaginatedRecordResponse } = require('../paginated-record-response');
  * Consult documentation for propoer syntax
  * https://developer.shotgunsoftware.com/rest-api/#searching
  *
- * @param  {string}   options.entity       - Entity type.
- * @param  {Object}   options.filters      - Filter input (array or hash format).
- * @param  {Object}   [options.fields]     - List of fields to show.
- * @param  {string[]} [options.sort]       - List of fields used as sort order.
- * @param  {number}   [options.pageSize]   - Upper limit of items shown on response page.
- * @param  {number}   [options.pageNumber] - Position in list of items to start querying from.
+ * @param  {string}       options.entity       - Entity type.
+ * @param  {Object}       options.filters      - Filter input (array or hash format).
+ * @param  {Array|String} [options.fields]     - List of fields to show.
+ * @param  {Array|String} [options.sort]       - List of ordering fields.
+ * @param  {number}       [options.pageSize]   - Upper limit of items shown on response page.
+ * @param  {number}       [options.pageNumber] - Position in list of items to start querying from.
  * @return {PaginatedRecordResponse} Query results.
  */
 ShotgunApiClient.prototype.entitySearch = async function({ entity, filters, fields, sort, pageSize, pageNumber }) {
@@ -29,7 +29,9 @@ ShotgunApiClient.prototype.entitySearch = async function({ entity, filters, fiel
 		query.fields = fields;
 
 	if (Array.isArray(sort))
-		query.sort = sort.join(',');
+		sort = sort.join(',');
+	if (sort)
+		query.sort = sort;
 
 	let contentType = Array.isArray(filters) ? 'array' : 'hash';
 

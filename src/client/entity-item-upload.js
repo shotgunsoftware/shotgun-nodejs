@@ -69,6 +69,6 @@ ShotgunApiClient.prototype.entityItemUpload = async function({ entity, entityId,
 			'upload_info': uploadMetadata.data,
 			'upload_data': additionalUploadData
 		},
-		skipApiPathPrepend: true,
+		skipBasePathPrepend: true,
 	});
 };
