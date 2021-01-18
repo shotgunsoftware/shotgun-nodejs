@@ -12,7 +12,7 @@
     "yargs": "^16.0.3"
   },
   "name": "shotgun-nodejs",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "Autodesk Shotgun REST API library and CLI",
   "main": "src/client.js",
   "bin": {
