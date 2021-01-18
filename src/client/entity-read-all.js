@@ -4,14 +4,16 @@ const { PaginatedRecordResponse } = require('../paginated-record-response');
 /**
  * Read multiple entities.
  *
- * @param  {string}   options.entity       - Entity type.
- * @param  {Object}   [options.fields]     - List of fields to show.
- * @param  {Object}   [options.filter]     - List of filters.
- * @param  {number}   [options.pageSize]   - Upper limit of items shown on response page.
- * @param  {number}   [options.pageNumber] - Position in list of items to start querying from.
+ * @param  {string}       options.entity       - Entity type.
+ * @param  {Object}       [options.filter]     - List of filters.
+ * @param  {Array|String} [options.fields]     - List of fields to show.
+ * @param  {Array|String} [options.sort]       - List of ordering fields.
+ * @param  {number}       [options.pageSize]   - Upper limit of items shown on response page.
+ * @param  {number}       [options.pageNumber] - Position in list of items to start querying from.
+ * @param  {Object}       [options.options]    - Request option settings.
  * @return {PaginatedRecordResponse} Targered partial response.
  */
-ShotgunApiClient.prototype.entityReadAll = async function({ entity, fields, filter, pageSize, pageNumber }) {
+ShotgunApiClient.prototype.entityReadAll = async function({ entity, filter, fields, sort, pageSize, pageNumber, options }) {
 
 	let query = {
 		page: {
@@ -20,15 +22,24 @@ ShotgunApiClient.prototype.entityReadAll = async function({ entity, fields, filt
 		},
 	};
 
+	if (filter) {
+		for (let k in filter) {
+			query[`filter[${k}]`] = filter[k];
+		}
+	}
+
 	if (Array.isArray(fields))
 		fields = fields.join(',');
 	if (fields)
 		query.fields = fields;
 
-	if (filter) {
-		for (let k in filter) {
-			query[`filter[${k}]`] = filter[k];
-		}
+	if (Array.isArray(sort))
+		sort = sort.join(',');
+	if (sort)
+		query.sort = sort;
+
+	if (options) {
+		query.options = options;
 	}
 
 	let respBody = await this.request({

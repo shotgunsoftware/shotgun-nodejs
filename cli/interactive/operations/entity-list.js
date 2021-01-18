@@ -19,7 +19,7 @@ async function run({ client, defaults }) {
 
 		let { selectedFields } = await inquirer.prompt([{
 			name: 'selectedFields',
-			message: 'Select fields',
+			message: 'Select fields (Type to search. Press space to select)',
 			type: 'checkbox-plus',
 			pageSize: 15,
 			highlight: true,
@@ -54,6 +54,13 @@ async function run({ client, defaults }) {
 		default: 500,
 	}]);
 
+	let { sort } = await inquirer.prompt([{
+		name: 'sort',
+		message: 'Sorting:',
+		type: 'input',
+		default: null,
+	}]);
+
 	// Sanity
 	if (isNaN(pageSize)) pageSize = 500;
 
@@ -62,6 +69,7 @@ async function run({ client, defaults }) {
 		fields,
 		filter,
 		pageSize,
+		sort,
 	});
 }
 

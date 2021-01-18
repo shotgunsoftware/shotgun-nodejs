@@ -22,15 +22,27 @@ More information about each command may be retrieved with --help.`)
 				alias: 's',
 				default: process.env.SHOTGUN_SITE,
 			},
+			grant_type: {
+				description: 'Shotgun access grant type. Defaults to $SHOTGUN_GRANT_TYPE.',
+				default: process.env.SHOTGUN_GRANT_TYPE || 'password',
+			},
 			username: {
-				description: 'Shotgun credentials password. Defaults to $SHOTGUN_USERNAME.',
+				description: 'Shotgun password credentials password. Defaults to $SHOTGUN_USERNAME.',
 				alias: 'u',
 				default: process.env.SHOTGUN_USERNAME,
 			},
 			password: {
-				description: 'Shotgun credentials password. Defaults to $SHOTGUN_PASSWORD.',
+				description: 'Shotgun password credentials password. Defaults to $SHOTGUN_PASSWORD.',
 				alias: 'p',
 				default: process.env.SHOTGUN_PASSWORD,
+			},
+			client_id: {
+				description: 'Shotgun client credentials ID. Defaults to $SHOTGUN_CLIENT_ID.',
+				default: process.env.SHOTGUN_CLIENT_ID,
+			},
+			client_secret: {
+				description: 'Shotgun client credentials secret. Defaults to $SHOTGUN_CLIENT_SECRET.',
+				default: process.env.SHOTGUN_CLIENT_SECRET,
 			},
 			debug: {
 				description: 'Debug mode',
