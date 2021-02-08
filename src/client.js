@@ -3,7 +3,7 @@ const qs = require('qs');
 const requireAll = require('require-all');
 const util = require('util');
 
-const { ErrorResponse, RequestError } = require('./error');
+const { RequestError } = require('./error');
 
 const REFRESH_EXPIRATION_WINDOW = 1000 * 60 * 3;
 const DEFAULT_API_BASE_PATH = '/api/v1';
@@ -48,17 +48,18 @@ class ShotgunApiClient {
 			}
 		});
 
+		if (!resp.ok) {
+
+			let respBody = await resp.text();
+			let errorResp = new RequestError({ respBody });
+			throw new Error(`Error getting connect response: ${errorResp}`);
+		}
+
 		let body;
 		try {
 			body = await resp.json();
 		} catch (err) {
 			throw new Error(`Error parsing connect response: ${err.message}`);
-		}
-
-		if (!resp.ok) {
-
-			let errorResp = new ErrorResponse(body);
-			throw new Error(`Error getting connect response: ${errorResp}`);
 		}
 
 		this.token = body;
@@ -86,16 +87,18 @@ class ShotgunApiClient {
 			}
 		});
 
+		if (!resp.ok) {
+
+			let respBody = await resp.text();
+			let errorResp = new RequestError({ respBody });
+			throw new Error(`Error getting refresh token response: ${errorResp}`);
+		}
+
 		let body;
 		try {
 			body = await resp.json();
 		} catch (err) {
 			throw new Error(`Error parsing refresh token response: ${err.message}`);
-		}
-
-		if (!resp.ok) {
-			let errorResp = new ErrorResponse(body);
-			throw new Error(`Error getting refresh token response: ${errorResp}`);
 		}
 
 		this.token = body;
