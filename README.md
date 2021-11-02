@@ -7,35 +7,6 @@ npm install shotgun-nodejs
 
 ## Getting Started
 
-### Using as a CLI (interactive)
-
-```sh
-# One time global installation
-npm install -g shotgun-nodejs
-
-# Interactive mode
-shotgun-nodejs
-```
-
-### Using as a CLI (non-interactive)
-
-```sh
-# One time global installation
-npm install -g shotgun-nodejs
-
-# Command invocation
-shotgun-nodejs --site https://mysite.shotgunstudio.com --username username --password password entity-read HumanUser 3
-
-# Credentials setup alternative
-export SHOTGUN_SITE=https://mysite.shotgunstudio.com
-export SHOTGUN_USERNAME=username
-export SHOTGUN_PASSWORD=password
-
-shotgun-nodejs entity-read HumanUser 3
-```
-
-To view a list of available commands, refer to `shotgun-nodejs --help`.
-
 ### Using as a library
 ```javascript
 const { ShotgunApiClient } = require('shotgun-nodejs');
@@ -94,8 +65,6 @@ a different type of credentials object to the constructor object as follows:
 	refresh_token: 'token',
 }
 ```
-
-Interactive CLI only supports password-based authentication at the moment.
 
 ## Missing Support
 
