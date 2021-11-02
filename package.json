@@ -1,31 +1,22 @@
 {
   "dependencies": {
-    "chalk": "^4.1.0",
-    "cli-table3": "^0.6.0",
     "file-type": "^15.0.1",
-    "fuzzy": "^0.1.3",
-    "inquirer": "^7.3.3",
-    "inquirer-checkbox-plus-prompt": "^1.0.1",
-    "node-fetch": "^2.6.1",
-    "qs": "^6.9.4",
-    "require-all": "^3.0.0",
-    "yargs": "^16.0.3"
+    "node-fetch": "^2.6.6",
+    "qs": "^6.10.1",
+    "require-all": "^3.0.0"
   },
   "name": "shotgun-nodejs",
-  "version": "3.2.0",
-  "description": "Autodesk Shotgun REST API library and CLI",
-  "main": "src/client.js",
-  "bin": {
-    "shotgun-nodejs": "cli/index.js"
-  },
+  "version": "4.0.0",
+  "description": "Autodesk Shotgrid REST API library",
+  "main": "src/index.js",
   "devDependencies": {
-    "eslint": "^7.9.0"
+    "eslint": "^7.32.0"
   },
   "scripts": {
-    "cli": "node ./cli/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
+    "shotgrid",
     "shotgun"
   ],
   "author": "",

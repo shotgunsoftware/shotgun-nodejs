@@ -1,4 +1,4 @@
-# Shotgun API Javascript Client and CLI
+# Shotgrid API Javascript Client
 
 ## Installation
 ```sh
@@ -6,35 +6,6 @@ npm install shotgun-nodejs
 ```
 
 ## Getting Started
-
-### Using as a CLI (interactive)
-
-```sh
-# One time global installation
-npm install -g shotgun-nodejs
-
-# Interactive mode
-shotgun-nodejs
-```
-
-### Using as a CLI (non-interactive)
-
-```sh
-# One time global installation
-npm install -g shotgun-nodejs
-
-# Command invocation
-shotgun-nodejs --site https://mysite.shotgunstudio.com --username username --password password entity-read HumanUser 3
-
-# Credentials setup alternative
-export SHOTGUN_SITE=https://mysite.shotgunstudio.com
-export SHOTGUN_USERNAME=username
-export SHOTGUN_PASSWORD=password
-
-shotgun-nodejs entity-read HumanUser 3
-```
-
-To view a list of available commands, refer to `shotgun-nodejs --help`.
 
 ### Using as a library
 ```javascript
@@ -60,7 +31,7 @@ const { ShotgunApiClient } = require('shotgun-nodejs');
 
 ### Authentication through other methods
 
-You may authenticate using other methods when using as a library by inputting
+You may authenticate using other methods by inputting
 a different type of credentials object to the constructor object as follows:
 
 ```javascript
@@ -95,14 +66,11 @@ a different type of credentials object to the constructor object as follows:
 }
 ```
 
-Interactive CLI only supports password-based authentication at the moment.
-
 ## Missing Support
 
 Currently not able to perform the following:
 
-- Entity record revive
-- Entity follow-related
+- Entity follow-related support
 - Entity relationship-related support
 - Hierarchy data-related access
 - Webhooks-related access
@@ -116,10 +84,6 @@ Important files at a glance.
 
 ```
 shotgun-nodejs
-├── cli
-│    ├── commands           CLI command definitions
-│    └── interactive
-│        └── operations     CLI interactive choice definitions
 └── src
      └── client.js          Main module
 ```
