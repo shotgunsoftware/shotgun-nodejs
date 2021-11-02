@@ -7,7 +7,7 @@
   },
   "name": "shotgun-nodejs",
   "version": "4.0.0",
-  "description": "Autodesk Shotgun REST API library",
+  "description": "Autodesk Shotgrid REST API library",
   "main": "src/index.js",
   "devDependencies": {
     "eslint": "^7.32.0"

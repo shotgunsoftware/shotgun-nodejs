@@ -31,7 +31,7 @@ const { ShotgunApiClient } = require('shotgun-nodejs');
 
 ### Authentication through other methods
 
-You may authenticate using other methods when using as a library by inputting
+You may authenticate using other methods by inputting
 a different type of credentials object to the constructor object as follows:
 
 ```javascript
@@ -70,8 +70,7 @@ a different type of credentials object to the constructor object as follows:
 
 Currently not able to perform the following:
 
-- Entity record revive
-- Entity follow-related
+- Entity follow-related support
 - Entity relationship-related support
 - Hierarchy data-related access
 - Webhooks-related access
@@ -85,10 +84,6 @@ Important files at a glance.
 
 ```
 shotgun-nodejs
-├── cli
-│    ├── commands           CLI command definitions
-│    └── interactive
-│        └── operations     CLI interactive choice definitions
 └── src
      └── client.js          Main module
 ```
