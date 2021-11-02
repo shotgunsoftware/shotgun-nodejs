@@ -1,4 +1,4 @@
-# Shotgrid API Javascript Client and CLI
+# Shotgrid API Javascript Client
 
 ## Installation
 ```sh
