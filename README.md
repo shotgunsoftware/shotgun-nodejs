@@ -7,6 +7,10 @@ npm install shotgun-nodejs
 
 ## Getting Started
 
+### Using with CLI
+
+A companion CLI can be found at https://github.com/shotgunsoftware/shotgrid-nodejs-cli
+
 ### Using as a library
 ```javascript
 const { ShotgunApiClient } = require('shotgun-nodejs');
