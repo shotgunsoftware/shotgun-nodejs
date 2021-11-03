@@ -43,6 +43,7 @@ class PaginatedRecordResponse {
 		return out;
 	}
 
+	// TODO: Strip out to CLI
 	getTable() {
 
 		let { data } = this;
