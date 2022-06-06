@@ -1,5 +1,3 @@
-const Table = require('cli-table3');
-
 class PaginatedRecordResponse {
 
 	constructor({ data, links, _pageSize }) {
@@ -41,39 +39,6 @@ class PaginatedRecordResponse {
 			return;
 
 		return out;
-	}
-
-	// TODO: Strip out to CLI
-	getTable() {
-
-		let { data } = this;
-
-		let head = ['id'];
-		head = head.concat(data[0] && Object.keys(data[0].attributes) || []);
-		head = head.concat(data[0] && Object.keys(data[0].relationships) || []);
-
-		let table = new Table({ head });
-		for (let row of data) {
-			let values = [row.id];
-			values = values.concat(Object.values(row.attributes) || []);
-
-			let relationshipValues = Object.values(row.relationships) || [];
-			relationshipValues = relationshipValues.map(v => {
-				let { data } = v;
-				if (!data) return;
-				if (!Array.isArray(data)) return data.id;
-				return data.map(data2 => {
-					return (typeof data2 !== 'object' || !data2)
-						? data2
-						: data2.id;
-				}).join(', ');
-			});
-			values = values.concat(relationshipValues);
-
-			table.push(values);
-		}
-
-		return table.toString();
 	}
 }
 
