@@ -1,12 +1,14 @@
 const fetch = require('node-fetch');
 const qs = require('qs');
 const requireAll = require('require-all');
+const retry = require('async-retry');
 const util = require('util');
 
 const { RequestError } = require('./error');
 
-const REFRESH_EXPIRATION_WINDOW = 1000 * 60 * 3;
 const DEFAULT_API_BASE_PATH = '/api/v1';
+const REFRESH_EXPIRATION_WINDOW = 1000 * 60 * 3;
+const RETRY_COUNT = 2;
 
 class ShotgunApiClient {
 
@@ -41,7 +43,7 @@ class ShotgunApiClient {
 		// @NOTE Should they be cleared from memory at this time?
 		url.search = qs.stringify(credentials);
 
-		let resp = await fetch(url, {
+		let resp = await this.fetchWithRetry(url, {
 			method: 'POST',
 			headers: {
 				'Accept': 'application/json',
@@ -79,7 +81,7 @@ class ShotgunApiClient {
 			grant_type: 'refresh',
 		});
 
-		let resp = await fetch(url, {
+		let resp = await this.fetchWithRetry(url, {
 			method: 'POST',
 			headers: {
 				'Accept': 'application/json',
@@ -150,7 +152,7 @@ class ShotgunApiClient {
 		if (debug)
 			console.log('Sending request', requestId, url.href, util.inspect({ method, headers, body }, false, Infinity, true));
 
-		let resp = await fetch(url, { method, headers, body });
+		let resp = await this.fetchWithRetry(url, { method, headers, body });
 		return resp;
 	}
 
@@ -176,6 +178,27 @@ class ShotgunApiClient {
 			throw new RequestError({ method, path, respBody, resp });
 
 		return respBody;
+	}
+
+	async fetchWithRetry(...args) {
+
+		let { debug } = this;
+
+		return retry(
+			async (fnBail, attemptNumber) => {
+				if (debug)
+					console.log(`Request attempt #${attemptNumber}`);
+
+				let resp = await fetch(...args);
+				if (attemptNumber <= RETRY_COUNT && (resp.status >= 500 || resp.status === 0)) {
+					throw new Error('Force-trigger retry');
+				}
+				return resp;
+			},
+			{
+				retries: RETRY_COUNT,
+			}
+		);
 	}
 }
 
