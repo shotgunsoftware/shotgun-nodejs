@@ -118,9 +118,9 @@ class ShotgunApiClient {
 
 		let { token } = this;
 
-		if (!token || await this.tokenExpired(token['refresh_token'], 'refresh_token'))
+		if (!token || await this.tokenExpired(token['refresh_token']))
 			token = await this.connect();
-		else if (await this.tokenExpired(token['access_token'], 'access_token'))
+		else if (await this.tokenExpired(token['access_token']))
 			token = await this.refreshToken();
 
 		return `${token.token_type} ${token.access_token}`;
