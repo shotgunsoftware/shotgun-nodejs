@@ -111,7 +111,7 @@ class ShotgunApiClient {
 
 		let jwtPayload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
 
-		return (Date.now() / 1000) > jwtPayload['exp'];
+		return (Date.now() / 1000) > jwtPayload.exp;
 	}
 
 	async getAuthorizationHeader() {
