@@ -7,7 +7,6 @@ const util = require('util');
 const { RequestError } = require('./error');
 
 const DEFAULT_API_BASE_PATH = '/api/v1';
-const REFRESH_EXPIRATION_WINDOW = 1000 * 60 * 3;
 const RETRY_COUNT = 2;
 
 class ShotgunApiClient {
@@ -17,7 +16,6 @@ class ShotgunApiClient {
 		this.siteUrl = siteUrl;
 		this.credentials = credentials;
 		this._token = null;
-		this.tokenExpirationTimestamp = null;
 		this.debug = debug;
 
 		if (apiBasePath && !apiBasePath.startsWith('/'))
@@ -32,7 +30,6 @@ class ShotgunApiClient {
 
 	set token(val) {
 		this._token = val;
-		this.tokenExpirationTimestamp = val.expires_in * 1000 + Date.now();
 	}
 
 	async connect(credentials = this.credentials) {
@@ -107,13 +104,23 @@ class ShotgunApiClient {
 		return body;
 	}
 
-	async getAuthorizationHeader() {
-
-		let { token, tokenExpirationTimestamp } = this;
+	tokenExpired(token) {
 
 		if (!token)
+			return false;
+
+		let jwtPayload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+
+		return (Date.now() / 1000) > jwtPayload.exp;
+	}
+
+	async getAuthorizationHeader() {
+
+		let { token } = this;
+
+		if (!token || this.tokenExpired(token.refresh_token))
 			token = await this.connect();
-		else if (Date.now() + REFRESH_EXPIRATION_WINDOW > tokenExpirationTimestamp)
+		else if (this.tokenExpired(token.access_token))
 			token = await this.refreshToken();
 
 		return `${token.token_type} ${token.access_token}`;
