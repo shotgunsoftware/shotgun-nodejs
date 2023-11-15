@@ -5,7 +5,7 @@ const { PaginatedRecordResponse } = require('../paginated-record-response');
  * Read multiple entities.
  *
  * @param  {string}       options.entity       - Entity type.
- * @param  {Object}       [options.filter]     - List of filters.
+ * @param  {Object}       [options.filter]     - Key-value pair object to evaluate exact match filters.
  * @param  {Array|String} [options.fields]     - List of fields to show.
  * @param  {Array|String} [options.sort]       - List of ordering fields.
  * @param  {number}       [options.pageSize]   - Upper limit of items shown on response page.
