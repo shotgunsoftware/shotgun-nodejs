@@ -1,5 +1,4 @@
 const fileType = require('file-type');
-const { ShotgunApiClient } = require('../client');
 
 /**
  * Upload an entity item
@@ -12,7 +11,7 @@ const { ShotgunApiClient } = require('../client');
  * @param  {string[]} [options.additionalUploadData] - File metadata.
  * @return {Object} Request information.
  */
-ShotgunApiClient.prototype.entityItemUpload = async function({ entity, entityId, fieldName, targetFileName, uploadFileBlob, additionalUploadData = {} }) {
+const entityItemUpload = async function({ entity, entityId, fieldName, targetFileName, uploadFileBlob, additionalUploadData = {} }) {
 
 	let path = `/entity/${entity}/${entityId}`;
 	if (fieldName) path += `/${fieldName}`;
@@ -71,3 +70,5 @@ ShotgunApiClient.prototype.entityItemUpload = async function({ entity, entityId,
 		},
 	});
 };
+
+module.exports = entityItemUpload;

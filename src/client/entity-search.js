@@ -1,4 +1,3 @@
-const { ShotgunApiClient } = require('../client');
 const { PaginatedRecordResponse } = require('../paginated-record-response');
 
 /**
@@ -14,7 +13,7 @@ const { PaginatedRecordResponse } = require('../paginated-record-response');
  * @param  {number}       [options.pageNumber] - Position in list of items to start querying from.
  * @return {PaginatedRecordResponse} Query results.
  */
-ShotgunApiClient.prototype.entitySearch = async function({ entity, filters, fields, sort, pageSize, pageNumber }) {
+const entitySearch = async function({ entity, filters, fields, sort, pageSize, pageNumber }) {
 
 	let query = {
 		page: {
@@ -49,3 +48,5 @@ ShotgunApiClient.prototype.entitySearch = async function({ entity, filters, fiel
 	respBody._pageSize = pageSize;
 	return new PaginatedRecordResponse(respBody);
 };
+
+module.exports = entitySearch;

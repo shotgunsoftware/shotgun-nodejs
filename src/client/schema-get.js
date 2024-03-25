@@ -1,5 +1,3 @@
-const { ShotgunApiClient } = require('../client');
-
 /**
  * Get entity schema or entity fields schema.
  *
@@ -8,7 +6,7 @@ const { ShotgunApiClient } = require('../client');
  * @param  {number}  [options.projectId]      - Project associated with entity.
  * @return {Object} Schema (fields) definition.
  */
-ShotgunApiClient.prototype.schemaGet = async function({ entity, isFieldsWanted, projectId }) {
+const schemaGet = async function({ entity, isFieldsWanted, projectId }) {
 
 	let path = '/schema';
 	if (entity) {
@@ -29,3 +27,5 @@ ShotgunApiClient.prototype.schemaGet = async function({ entity, isFieldsWanted, 
 	});
 	return respBody.data;
 };
+
+module.exports = schemaGet;

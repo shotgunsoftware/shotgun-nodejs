@@ -1,4 +1,3 @@
-const { ShotgunApiClient } = require('../client');
 const { SchemaFieldDefinition } = require('../schema-field-definition');
 
 /**
@@ -8,7 +7,7 @@ const { SchemaFieldDefinition } = require('../schema-field-definition');
  * @param  {SchemaFieldDefinition} options.schemaFieldDefinition - Field definition.
  * @return {Object} Schema (fields) definition.
  */
-ShotgunApiClient.prototype.schemaFieldCreate = async function({ entity, schemaFieldDefinition }) {
+const schemaFieldCreate = async function({ entity, schemaFieldDefinition }) {
 
 	if (!(schemaFieldDefinition instanceof SchemaFieldDefinition))
 		schemaFieldDefinition = new SchemaFieldDefinition(schemaFieldDefinition);
@@ -22,3 +21,5 @@ ShotgunApiClient.prototype.schemaFieldCreate = async function({ entity, schemaFi
 	});
 	return respBody.data;
 };
+
+module.exports = schemaFieldCreate;

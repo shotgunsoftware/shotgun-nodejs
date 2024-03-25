@@ -1,5 +1,3 @@
-const { ShotgunApiClient } = require('../client');
-
 /**
  * Delete an entity.
  *
@@ -7,7 +5,7 @@ const { ShotgunApiClient } = require('../client');
  * @param  {number} options.entityId - Target entity ID.
  * @return {Object} Request result.
  */
-ShotgunApiClient.prototype.entityDelete = async function({ entity, entityId }) {
+const entityDelete = async function({ entity, entityId }) {
 
 	let respBody = await this.request({
 		method: 'DELETE',
@@ -15,3 +13,5 @@ ShotgunApiClient.prototype.entityDelete = async function({ entity, entityId }) {
 	});
 	return respBody;
 };
+
+module.exports = entityDelete;

@@ -1,4 +1,3 @@
-const { ShotgunApiClient } = require('../client');
 const { SchemaFieldDefinition } = require('../schema-field-definition');
 
 /**
@@ -10,7 +9,7 @@ const { SchemaFieldDefinition } = require('../schema-field-definition');
  * @param  {number}                [options.project]             - Associated project.
  * @return {Object} Operation response data.
  */
-ShotgunApiClient.prototype.schemaFieldUpdate = async function({ entity, fieldName, schemaFieldDefinition, projectId }) {
+const schemaFieldUpdate = async function({ entity, fieldName, schemaFieldDefinition, projectId }) {
 
 	if (!(schemaFieldDefinition instanceof SchemaFieldDefinition))
 		schemaFieldDefinition = new SchemaFieldDefinition(schemaFieldDefinition);
@@ -27,3 +26,5 @@ ShotgunApiClient.prototype.schemaFieldUpdate = async function({ entity, fieldNam
 	});
 	return respBody.data;
 };
+
+module.exports = schemaFieldUpdate;
