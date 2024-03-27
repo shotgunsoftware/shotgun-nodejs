@@ -1,5 +1,3 @@
-const { ShotgunApiClient } = require('../client');
-
 /**
  * Delete an entity schema field.
  *
@@ -7,7 +5,7 @@ const { ShotgunApiClient } = require('../client');
  * @param  {string} options.fieldName - Target field name.
  * @return {Object} Operation response data.
  */
-ShotgunApiClient.prototype.schemaFieldDelete = async function({ entity, fieldName }) {
+const schemaFieldDelete = async function({ entity, fieldName }) {
 
 	let respBody = await this.request({
 		method: 'DELETE',
@@ -15,3 +13,5 @@ ShotgunApiClient.prototype.schemaFieldDelete = async function({ entity, fieldNam
 	});
 	return respBody;
 };
+
+module.exports = schemaFieldDelete;

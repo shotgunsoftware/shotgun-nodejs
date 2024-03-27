@@ -1,4 +1,3 @@
-const { ShotgunApiClient } = require('../client');
 const { PaginatedRecordResponse } = require('../paginated-record-response');
 
 /**
@@ -13,7 +12,7 @@ const { PaginatedRecordResponse } = require('../paginated-record-response');
  * @param  {Object}       [options.options]    - Request option settings.
  * @return {PaginatedRecordResponse} Targered partial response.
  */
-ShotgunApiClient.prototype.entityReadAll = async function({ entity, filter, fields, sort, pageSize, pageNumber, options }) {
+const entityReadAll = async function({ entity, filter, fields, sort, pageSize, pageNumber, options }) {
 
 	let query = {
 		page: {
@@ -50,3 +49,5 @@ ShotgunApiClient.prototype.entityReadAll = async function({ entity, filter, fiel
 	respBody._pageSize = pageSize;
 	return new PaginatedRecordResponse(respBody);
 };
+
+module.exports = entityReadAll;

@@ -1,8 +1,8 @@
 const fetch = require('node-fetch');
 const qs = require('qs');
-const requireAll = require('require-all');
 const retry = require('async-retry');
 const util = require('util');
+const mixins = require('./client/index');
 
 const { RequestError } = require('./error');
 
@@ -209,10 +209,11 @@ class ShotgunApiClient {
 	}
 }
 
+// We remove require-all from dependencies as the were using fs
+// that is not supported in the browser.
+Object.assign(ShotgunApiClient.prototype, mixins);
+
 module.exports = {
 	default: ShotgunApiClient,
 	ShotgunApiClient,
 };
-
-// Apply mixins
-requireAll({ dirname: `${__dirname}/client` });
