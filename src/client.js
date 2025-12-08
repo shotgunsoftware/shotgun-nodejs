@@ -204,6 +204,14 @@ class ShotgunApiClient {
 			},
 			{
 				retries: RETRY_COUNT,
+				onRetry: async (err, attemptNumber) => {
+					// Hook for tests to advance fake timers
+					// Wait for next tick to ensure async-retry has set up setTimeout
+					if (this.onAfterSleepSetup) {
+						await Promise.resolve(); // Let async-retry set up setTimeout first
+						this.onAfterSleepSetup({ attemptNumber });
+					}
+				}
 			}
 		);
 	}
