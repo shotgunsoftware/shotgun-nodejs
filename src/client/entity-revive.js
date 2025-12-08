@@ -1,5 +1,3 @@
-const { ShotgunApiClient } = require('../client');
-
 /**
  * Revive an entity.
  *
@@ -7,7 +5,7 @@ const { ShotgunApiClient } = require('../client');
  * @param  {number} options.entityId  - Target entity ID.
  * @return {Object} Revived entity.
  */
-ShotgunApiClient.prototype.entityRevive = async function({ entity, entityId }) {
+const entityRevive = async function({ entity, entityId }) {
 
 	let respBody = await this.request({
 		method: 'POST',
@@ -18,3 +16,5 @@ ShotgunApiClient.prototype.entityRevive = async function({ entity, entityId }) {
 	});
 	return respBody.data;
 };
+
+module.exports = entityRevive;

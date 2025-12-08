@@ -1,5 +1,3 @@
-const { ShotgunApiClient } = require('../client');
-
 /**
  * Read a specific entity.
  *
@@ -9,7 +7,7 @@ const { ShotgunApiClient } = require('../client');
  * @param  {Object}       [options.options] - Request option settings.
  * @return {Object} Entity information.
  */
-ShotgunApiClient.prototype.entityRead = async function({ entity, entityId, fields, options }) {
+const entityRead = async function({ entity, entityId, fields, options }) {
 
 	let query = {};
 
@@ -29,3 +27,5 @@ ShotgunApiClient.prototype.entityRead = async function({ entity, entityId, field
 	});
 	return respBody.data;
 };
+
+module.exports = entityRead ;

@@ -1,5 +1,3 @@
-const { ShotgunApiClient } = require('../client');
-
 /**
  * Revive an entity schema field.
  *
@@ -7,7 +5,7 @@ const { ShotgunApiClient } = require('../client');
  * @param  {string} options.fieldName - Target field name.
  * @return {Object} Operation response data.
  */
-ShotgunApiClient.prototype.schemaFieldRevive = async function({ entity, fieldName }) {
+const schemaFieldRevive = async function({ entity, fieldName }) {
 
 	let respBody = await this.request({
 		method: 'POST',
@@ -15,3 +13,5 @@ ShotgunApiClient.prototype.schemaFieldRevive = async function({ entity, fieldNam
 	});
 	return respBody;
 };
+
+module.exports = schemaFieldRevive;

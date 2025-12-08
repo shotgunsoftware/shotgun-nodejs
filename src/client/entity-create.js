@@ -1,5 +1,3 @@
-const { ShotgunApiClient } = require('../client');
-
 /**
  * Create an entity.
  *
@@ -7,7 +5,7 @@ const { ShotgunApiClient } = require('../client');
  * @param  {Object} options.data   - Entity data.
  * @return {Object} Created entity.
  */
-ShotgunApiClient.prototype.entityCreate = async function({ entity, data }) {
+const entityCreate = async function({ entity, data }) {
 
 	let respBody = await this.request({
 		method: 'POST',
@@ -16,3 +14,5 @@ ShotgunApiClient.prototype.entityCreate = async function({ entity, data }) {
 	});
 	return respBody.data;
 };
+
+module.exports = entityCreate;

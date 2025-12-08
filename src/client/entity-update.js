@@ -1,5 +1,3 @@
-const { ShotgunApiClient } = require('../client');
-
 /**
  * Update an entity.
  *
@@ -8,7 +6,7 @@ const { ShotgunApiClient } = require('../client');
  * @param  {Object} options.data     - Entity data.
  * @return {Object} Updated entity.
  */
-ShotgunApiClient.prototype.entityUpdate = async function({ entity, entityId, data }) {
+const entityUpdate = async function({ entity, entityId, data }) {
 
 	let respBody = await this.request({
 		method: 'PUT',
@@ -17,3 +15,5 @@ ShotgunApiClient.prototype.entityUpdate = async function({ entity, entityId, dat
 	});
 	return respBody.data;
 };
+
+module.exports = entityUpdate;
