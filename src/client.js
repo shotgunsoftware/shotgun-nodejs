@@ -9,6 +9,18 @@ const { RequestError } = require('./error');
 const DEFAULT_API_BASE_PATH = '/api/v1';
 const RETRY_COUNT = 2;
 
+/**
+ * Shotgun API Client
+ * @class
+ * @property {string} siteUrl - The base URL for the Shotgun site
+ * @property {Object} credentials - Authentication credentials
+ * @property {boolean} debug - Enable debug logging
+ * @property {string} apiBasePath - Base path for API endpoints
+ * @property {Function} [onAfterSleepSetup] - Testing hook called after retry delay is scheduled.
+ *   Signature: function({ attemptNumber: number }): void
+ *   Purpose: Allows tests with fake timers to advance time after async-retry schedules setTimeout.
+ *   This should only be set in test environments to control retry timing with fake timers.
+ */
 class ShotgunApiClient {
 
 	constructor({ siteUrl, credentials, debug, apiBasePath = DEFAULT_API_BASE_PATH }) {
@@ -204,6 +216,17 @@ class ShotgunApiClient {
 			},
 			{
 				retries: RETRY_COUNT,
+				onRetry: async (err, attemptNumber) => {
+					// Testing hook: allows tests with fake timers to advance time after retry delay
+					// is scheduled by async-retry. We yield control with Promise.resolve() to ensure
+					// async-retry's setTimeout is registered before the test advances the clock.
+					// Example usage in tests:
+					//   client.onAfterSleepSetup = () => { this.clock.next(); };
+					if (this.onAfterSleepSetup) {
+						await Promise.resolve(); // Let async-retry set up setTimeout first
+						this.onAfterSleepSetup({ attemptNumber });
+					}
+				}
 			}
 		);
 	}
